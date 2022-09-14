@@ -24,8 +24,14 @@ public class RequestHandler implements Runnable {
     private byte[] getBody(InputStream in) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
         String path = getPath(br.readLine());
+        String log = path;
 
         try {
+            while (!"".equals(log)) {
+                logger.debug(log);
+                log = br.readLine();
+            }
+
             return Files.readAllBytes(new File("./webapp" + path).toPath());
         } catch (IOException e) {
             return "Hello World".getBytes();
