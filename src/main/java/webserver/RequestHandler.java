@@ -17,34 +17,13 @@ public class RequestHandler implements Runnable {
         this.connection = connectionSocket;
     }
 
-    private String getPath(String s) {
-        return s.split(" ")[1];
-    }
-
-    private byte[] getBody(InputStream in) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-        String path = getPath(br.readLine());
-        String log = path;
-
-        try {
-            while (!"".equals(log)) {
-                logger.debug(log);
-                log = br.readLine();
-            }
-
-            return Files.readAllBytes(new File("./webapp" + path).toPath());
-        } catch (IOException e) {
-            return "Hello World".getBytes();
-        }
-    }
-
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = getBody(in);
+            byte[] body = RequestUtil.getBody(in);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
