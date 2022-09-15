@@ -16,7 +16,7 @@ public class RequestUtil {
         String log = path;
 
         try {
-            while (!"".equals(log)) {
+            while (!"".equals(log) && log != null) {
                 logger.debug(log);
                 log = br.readLine();
             }
