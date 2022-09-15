@@ -1,5 +1,9 @@
 package model;
 
+import util.HttpRequestUtils;
+
+import java.util.Map;
+
 public class User {
     private String userId;
     private String password;
@@ -32,5 +36,15 @@ public class User {
     @Override
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
+    }
+
+    public static User userOf(String url) {
+        String queryStr = url.split("\\?")[1];
+        Map<String, String> parsedQueryStr = HttpRequestUtils.parseQueryString(queryStr);
+
+        return new User(parsedQueryStr.get("userId"),
+                parsedQueryStr.get("password"),
+                parsedQueryStr.get("name"),
+                parsedQueryStr.get("email"));
     }
 }
