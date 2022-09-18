@@ -1,26 +1,13 @@
 package webserver.request;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 
 public class RequestUtil {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
-    public static byte[] getBody(InputStream in) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-        String path = getPath(br.readLine());
-        String log = path;
-
+    public static byte[] getBody(RequestInfo requestInfo) throws IOException {
         try {
-            while (!"".equals(log) && log != null) {
-                logger.debug(log);
-                log = br.readLine();
-            }
-
+            String path = requestInfo.getDirectory();
             return Files.readAllBytes(new File("./webapp" + path).toPath());
         } catch (IOException e) {
             return "Hello World".getBytes();
