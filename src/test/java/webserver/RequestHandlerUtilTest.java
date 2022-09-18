@@ -2,7 +2,7 @@ package webserver;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import webserver.request.RequestUtil;
+import webserver.request.HttpRequestUtil;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +16,7 @@ public class RequestHandlerUtilTest {
     void createHttpRequest() throws IOException {
         InputStream is = new ByteArrayInputStream("GET /index.html HTTP/1.1\nHost: localhost:8080\nConnection: keep-alive\nAccept: */*".getBytes());
 
-        String s = RequestUtil.getPath(new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)).readLine());
+        String s = HttpRequestUtil.getPath(new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)).readLine());
         assertThat(s).isEqualTo("/index.html");
     }
 
@@ -25,7 +25,7 @@ public class RequestHandlerUtilTest {
     void readValidFile() throws IOException {
         InputStream is = new ByteArrayInputStream("GET /index.html HTTP/1.1\nHost: localhost:8080\nConnection: keep-alive\nAccept: */*".getBytes());
 
-        String s = new String(RequestUtil.getBody(is), StandardCharsets.UTF_8);
+        String s = new String(HttpRequestUtil.getBody(is), StandardCharsets.UTF_8);
 
         // html 문서가 정상적으로 로드 되었는가?
         assertThat(s).contains("<!DOCTYPE html>");
@@ -36,7 +36,7 @@ public class RequestHandlerUtilTest {
     void readInvalidFile() throws IOException {
         InputStream is = new ByteArrayInputStream("GET /notIndex.html HTTP/1.1\nHost: localhost:8080\nConnection: keep-alive\nAccept: */*".getBytes());
 
-        String s = new String(RequestUtil.getBody(is), StandardCharsets.UTF_8);
+        String s = new String(HttpRequestUtil.getBody(is), StandardCharsets.UTF_8);
 
         assertThat(s).isEqualTo("Hello World");
     }

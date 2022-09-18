@@ -2,29 +2,29 @@ package webserver.request;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.HttpMethod;
+import webserver.HttpMethod;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class RequestInfo {
-    private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
+public class HttpRequest {
+    private static final Logger logger = LoggerFactory.getLogger(HttpRequestUtil.class);
     private String host;
     private String directory;
     private String MIMEType;
     private HttpMethod httpMethod;
 
-    public RequestInfo() {
+    public HttpRequest() {
     }
 
-    public RequestInfo(String directory, HttpMethod httpMethod) {
+    public HttpRequest(String directory, HttpMethod httpMethod) {
         this.directory = directory;
         this.httpMethod = httpMethod;
     }
 
-    public RequestInfo(String host, String directory, String MIMEType, HttpMethod httpMethod) {
+    public HttpRequest(String host, String directory, String MIMEType, HttpMethod httpMethod) {
         this.host = host;
         this.directory = directory;
         this.MIMEType = MIMEType;
@@ -51,12 +51,12 @@ public class RequestInfo {
         return s.split(" ")[0].replace(":", "");
     }
 
-    public static RequestInfo requestInfoOf(InputStream in) throws IOException {
+    public static HttpRequest requestInfoOf(InputStream in) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         String headerStr = br.readLine();
-        String path = RequestUtil.getPath(headerStr);
+        String path = HttpRequestUtil.getPath(headerStr);
         HttpMethod httpMethod = HttpMethod.valueOf(headerStr.split(" ")[0].toUpperCase());
-        RequestInfo requestInfo = new RequestInfo(path, httpMethod);
+        HttpRequest httpRequest = new HttpRequest(path, httpMethod);
 
         while ((headerStr = br.readLine()) != null && !"".equals(headerStr)) {
             logger.debug(headerStr);
@@ -64,16 +64,16 @@ public class RequestInfo {
 
             switch (headerName) {
                 case "Host":
-                    requestInfo.host = headerStr.split(" ")[1];
+                    httpRequest.host = headerStr.split(" ")[1];
                     break;
                 case "Accept":
-                    requestInfo.MIMEType = headerStr.split(" ")[1].split(",")[0];
+                    httpRequest.MIMEType = headerStr.split(" ")[1].split(",")[0];
                     break;
                 default:
                     break;
             }
         }
 
-        return requestInfo;
+        return httpRequest;
     }
 }

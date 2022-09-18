@@ -1,7 +1,9 @@
-package webserver.request;
+package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.request.HttpRequest;
+import webserver.request.HttpRequestUtil;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -24,19 +26,19 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             DataOutputStream dos = new DataOutputStream(out);
-            RequestInfo requestInfo = RequestInfo.requestInfoOf(in);
-            byte[] body = RequestUtil.getBody(requestInfo);
-            response200Header(dos, requestInfo, body.length);
+            HttpRequest httpRequest = HttpRequest.requestInfoOf(in);
+            byte[] body = HttpRequestUtil.getBody(httpRequest);
+            response200Header(dos, httpRequest, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, RequestInfo requestInfo, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, HttpRequest httpRequest, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + requestInfo.getMIMEType() + ";charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + httpRequest.getMIMEType() + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
