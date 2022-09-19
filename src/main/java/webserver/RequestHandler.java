@@ -2,8 +2,10 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.controller.ControllerResolver;
+import webserver.enums.HttpStatus;
 import webserver.request.HttpRequest;
-import webserver.request.HttpRequestUtil;
+import webserver.response.HttpResponse;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,11 +15,12 @@ import java.net.Socket;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
+    private ControllerResolver controllerResolver;
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        this.controllerResolver = new ControllerResolver();
     }
 
     public void run() {
@@ -27,28 +30,33 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             DataOutputStream dos = new DataOutputStream(out);
             HttpRequest httpRequest = HttpRequest.requestInfoOf(in);
-            byte[] body = HttpRequestUtil.getBody(httpRequest);
-            response200Header(dos, httpRequest, body.length);
-            responseBody(dos, body);
+            HttpResponse response = controllerResolver.resolve(httpRequest);
+
+            responseHeader(dos, response);
+            responseBody(dos, response);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, HttpRequest httpRequest, int lengthOfBodyContent) {
+    private void responseHeader(DataOutputStream dos, HttpResponse httpResponse) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + httpRequest.getMIMEType() + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            HttpStatus httpStatus = httpResponse.getHttpStatus();
+
+            dos.writeBytes(httpResponse.getProtocol() + " ");
+            dos.writeBytes(httpStatus.getCode() + " " );
+            dos.writeBytes(httpStatus.getMessage() + "\r\n");
+            dos.writeBytes("Content-Type: " + httpResponse.getContentType() + ";charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + httpResponse.getContentLength() + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
+    private void responseBody(DataOutputStream dos, HttpResponse httpResponse) {
         try {
-            dos.write(body, 0, body.length);
+            dos.write(httpResponse.getBody(), 0, httpResponse.getContentLength());
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
