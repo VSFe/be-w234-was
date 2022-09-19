@@ -23,6 +23,10 @@ public class ControllerResolver {
         HttpMethod method = httpRequest.getHttpMethod();
         logger.debug(url);
 
+        if (method == HttpMethod.GET && url.equals("/user/create")) {
+            return userController.createUser(httpRequest);
+        }
+
         // 이후 다양한 Controller에 대한 Resolve
         return new HttpResponse.Builder()
                 .setContentType(httpRequest.getMIMEType() + ";charset=utf-8")
