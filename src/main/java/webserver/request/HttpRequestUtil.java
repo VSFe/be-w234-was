@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 public class HttpRequestUtil {
-    public static byte[] getBody(String path) throws IOException {
+    public static byte[] getBody(String path) {
         try {
             return Files.readAllBytes(new File("./webapp" + path).toPath());
         } catch (IOException e) {
