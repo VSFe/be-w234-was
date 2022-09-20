@@ -39,7 +39,14 @@ public class User {
     }
 
     public static User userOf(String url) {
-        String queryStr = url.split("\\?")[1];
+        String queryStr;
+
+        if (url.contains("\\?")) {
+            queryStr = url.split("\\?")[0];
+        } else {
+            queryStr = url;
+        }
+
         Map<String, String> parsedQueryStr = HttpRequestUtils.parseQueryString(queryStr);
 
         return new User(parsedQueryStr.get("userId"),
