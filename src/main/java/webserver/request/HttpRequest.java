@@ -3,6 +3,7 @@ package webserver.request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
+import util.IOUtils;
 import webserver.enums.HttpMethod;
 
 import java.io.BufferedReader;
@@ -16,8 +17,10 @@ public class HttpRequest {
     private String host;
     private String directory;
     private String MIMEType;
+    private int contentLength;
     private HttpMethod httpMethod;
     private Map<String, String> parameters;
+    private byte[] body;
 
     public HttpRequest() {
     }
@@ -27,11 +30,13 @@ public class HttpRequest {
         this.httpMethod = httpMethod;
     }
 
-    public HttpRequest(String host, String directory, String MIMEType, HttpMethod httpMethod) {
+    public HttpRequest(String host, String directory, String MIMEType, int contentLength, HttpMethod httpMethod, byte[] body) {
         this.host = host;
         this.directory = directory;
         this.MIMEType = MIMEType;
+        this.contentLength = contentLength;
         this.httpMethod = httpMethod;
+        this.body = body;
     }
 
     public String getHost() {
@@ -46,8 +51,20 @@ public class HttpRequest {
         return MIMEType;
     }
 
+    public int getContentLength() {
+        return contentLength;
+    }
+
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
     public HttpMethod getHttpMethod() {
         return httpMethod;
+    }
+
+    public byte[] getBody() {
+        return body;
     }
 
     private static String getHeaderName(String s) {
@@ -62,6 +79,7 @@ public class HttpRequest {
                 ", MIMEType='" + MIMEType + '\'' +
                 ", httpMethod=" + httpMethod +
                 ", parameters=" + parameters +
+                ", body=" + body +
                 '}';
     }
 
@@ -84,7 +102,14 @@ public class HttpRequest {
                 case "Accept":
                     httpRequest.MIMEType = headerStr.split(" ")[1].split(",")[0];
                     break;
+                case "Content-Length":
+                    httpRequest.contentLength = Integer.parseInt(headerStr.split(" ")[1]);
+                    break;
             }
+        }
+
+        if (httpRequest.contentLength > 0) {
+            httpRequest.body = IOUtils.readData(br, httpRequest.contentLength).getBytes();
         }
 
         logger.debug(String.valueOf(httpRequest));
