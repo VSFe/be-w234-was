@@ -48,6 +48,11 @@ public class RequestHandler implements Runnable {
             dos.writeBytes(httpStatus.getMessage() + "\r\n");
             dos.writeBytes("Content-Type: " + httpResponse.getContentType() + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + httpResponse.getContentLength() + "\r\n");
+
+            for (var header : httpResponse.getHeaders().entrySet()) {
+                dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
+            }
+
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
