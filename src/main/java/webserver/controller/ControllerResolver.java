@@ -24,7 +24,11 @@ public class ControllerResolver {
         logger.debug(url);
 
         if (method == HttpMethod.GET && url.equals("/user/create")) {
-            return userController.createUser(httpRequest);
+            return userController.createUserWithGET(httpRequest);
+        }
+
+        if (method == HttpMethod.POST && url.equals("/user/create")) {
+            return userController.createUserWithPOST(httpRequest);
         }
 
         // 이후 다양한 Controller에 대한 Resolve
