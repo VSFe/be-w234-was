@@ -68,7 +68,7 @@ public class HttpRequest {
     }
 
     private static String getHeaderName(String s) {
-        return s.split(" ")[0].replace(":", "");
+        return s.replace(" ", "").split(":")[0];
     }
 
     @Override
