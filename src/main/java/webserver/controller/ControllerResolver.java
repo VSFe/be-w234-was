@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import webserver.enums.HttpMethod;
 import webserver.enums.HttpStatus;
 import webserver.request.HttpRequest;
-import webserver.request.HttpRequestUtil;
+import webserver.utils.HttpRequestUtil;
 import webserver.response.HttpResponse;
 
 import java.io.IOException;
@@ -29,6 +29,10 @@ public class ControllerResolver {
 
         if (method == HttpMethod.POST && url.equals("/user/create")) {
             return userController.createUserWithPOST(httpRequest);
+        }
+
+        if (method == HttpMethod.POST && url.equals("/user/login")) {
+            return userController.loginWithPOST(httpRequest);
         }
 
         // 이후 다양한 Controller에 대한 Resolve

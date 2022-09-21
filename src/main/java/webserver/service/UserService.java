@@ -30,4 +30,13 @@ public class UserService {
             throw new MethodNotSupportedException();
         }
     }
+
+    public boolean login(HttpRequest request) {
+        String url = new String(request.getBody(), StandardCharsets.UTF_8);
+        User user = User.userOf(url);
+        User compareUser = Database.findUserById(user.getUserId());
+
+        return compareUser != null &&
+                compareUser.getPassword().equals(user.getPassword());
+    }
 }
