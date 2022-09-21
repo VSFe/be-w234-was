@@ -5,11 +5,13 @@ import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 import util.IOUtils;
 import webserver.enums.HttpMethod;
+import webserver.utils.HttpRequestUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest {
@@ -19,6 +21,7 @@ public class HttpRequest {
     private String MIMEType;
     private int contentLength;
     private HttpMethod httpMethod;
+    private Map<String, String> headers;
     private Map<String, String> parameters;
     private byte[] body;
 
@@ -28,6 +31,7 @@ public class HttpRequest {
     public HttpRequest(String directory, HttpMethod httpMethod) {
         this.directory = directory;
         this.httpMethod = httpMethod;
+        this.headers = new HashMap<>();
     }
 
     public HttpRequest(String host, String directory, String MIMEType, int contentLength, HttpMethod httpMethod, byte[] body) {
@@ -37,6 +41,7 @@ public class HttpRequest {
         this.contentLength = contentLength;
         this.httpMethod = httpMethod;
         this.body = body;
+        this.headers = new HashMap<>();
     }
 
     public String getHost() {
@@ -57,6 +62,9 @@ public class HttpRequest {
 
     public Map<String, String> getParameters() {
         return parameters;
+    }
+    public Map<String, String> getHeaders() {
+        return headers;
     }
 
     public HttpMethod getHttpMethod() {
@@ -80,6 +88,7 @@ public class HttpRequest {
                 ", httpMethod=" + httpMethod +
                 ", parameters=" + parameters +
                 ", body=" + body +
+                ", headers=" + headers +
                 '}';
     }
 
@@ -105,6 +114,9 @@ public class HttpRequest {
                 case "Content-Length":
                     httpRequest.contentLength = Integer.parseInt(headerStr.split(" ")[1]);
                     break;
+                default:
+                    String[] headerPair = headerStr.replace(" ", "").split(":");
+                    httpRequest.headers.put(headerPair[0], headerPair[1]);
             }
         }
 
