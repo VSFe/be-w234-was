@@ -1,4 +1,4 @@
-package webserver.request;
+package webserver.utils;
 
 import java.io.File;
 import java.io.IOException;
