@@ -16,13 +16,12 @@ public class CookieUtil {
     }
 
     public static Map<String, String> getCookies(HttpRequest httpRequest) {
-        if (!httpRequest.getParameters().containsKey("Set-Cookie")) {
+        if (!httpRequest.getHeaders().containsKey("Cookie")) {
             return new HashMap<>();
         }
 
-        return Arrays.stream(httpRequest.getParameters().get("Set-Cookie")
+        return Arrays.stream(httpRequest.getHeaders().get("Cookie")
                         .replace(" ", "")
-                        .split(":")[1]
                         .split(";"))
                         .map(str -> str.split("="))
                         .collect(Collectors.toMap(e -> e[0], e -> e[1]));
